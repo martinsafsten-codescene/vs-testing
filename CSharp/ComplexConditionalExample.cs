@@ -1,7 +1,41 @@
-﻿namespace Codescene.VSExtension.CodeSmells.Issues.CSharp
+﻿using System.Text;
+using System.Text.RegularExpressions;
+
+namespace Codescene.VSExtension.CodeSmells.Issues.CSharp
 {
     class ComplexConditionalExample
     {
+        public void ProcessDirectory(string path)
+        {
+            var files = new List<string>();
+            var directory = new DirectoryInfo(path);
+
+            foreach (FileInfo fileInfo in directory.GetFiles())
+            {
+                if (Regex.IsMatch(fileInfo.Name, @"^data\d+\.csv$"))
+                {
+                    files.Add(fileInfo.FullName);
+                }
+            }
+
+            var sb = new StringBuilder();
+            foreach (string filePath in files)
+            {
+                using (var reader = new StreamReader(filePath))
+                {
+                    string line;
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        sb.Append(line);
+                    }
+                }
+            }
+
+            using (var writer = new StreamWriter("data.csv"))
+            {
+                writer.Write(sb.ToString());
+            }
+        }
         public string ComplexConditional(int value1, int value2)
         {
             if (value1 > 10 && value2 < 5 || value2 == 100)
